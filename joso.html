@@ -39,7 +39,7 @@ function clip() {
   var nw = map.containerPointToLayerPoint([0, 0]),
       se = map.containerPointToLayerPoint(map.getSize()),
       clipX = nw.x + (se.x - nw.x) * range.value;
-  ort1940.getContainer().style.clip =
+  cmp.getContainer().style.clip =
     'rect(' + [nw.y, clipX, se.y, nw.x].join('px,') + 'px)';
 }
 range['oninput' in range ? 'oninput' : 'onchange'] = clip;
