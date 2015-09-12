@@ -31,7 +31,7 @@ var cmp = L.tileLayer(
     attribution: "国土地理院", maxNativeZoom: 18, maxZoom: 20
 });
 var map = L.map('mapdiv', {
-  center: [36.0315, 139.9892], zoom: 16, minZoom: 16, 
+  center: [36.0315, 139.9892], zoom: 16, minZoom: 10, 
   layers: [ort, cmp], zoomControl: false});
 new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
 var hash = L.hash(map);
