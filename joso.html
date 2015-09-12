@@ -12,7 +12,7 @@
 <style>
 body {padding: 0; margin: 0}
 html, body, #mapdiv {height: 100%; width: 100%;}
-.leaflet-container {background: #fff; bottom: 20px}
+.leaflet-container {background: #fff; bottom: 40px}
 .range {position: absolute; width: 100%; bottom: 0px}
 input[type='range']{-webkit-appearance: none;
   -moz-appearance:none; background-color: #a59aca;}
@@ -30,9 +30,10 @@ var cmp = L.tileLayer(
   'http://cyberjapandata.gsi.go.jp/xyz/20150911dol2/{z}/{x}/{y}.png', {
     attribution: "国土地理院", maxNativeZoom: 18, maxZoom: 20
 });
-var map = L.map('mapdiv', {
-  center: [38.554207, 140.936222], zoom: 13, layers: [ort, cmp]});
-new L.Control.Zoom({position: 'bottomright'}).addTo(map);
+var map = L.map('mapdiv', {zoomControl: false,
+  center: [36.0315, 139.9892], zoom: 16, minZoom: 16, 
+  layers: [ort, cmp]});
+map.addControl(L.control.zoom({position: 'bottomeleft'}));
 var hash = L.hash(map);
 var range = document.getElementById('range');
 function clip() {
