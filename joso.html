@@ -30,10 +30,10 @@ var cmp = L.tileLayer(
   'http://cyberjapandata.gsi.go.jp/xyz/20150911dol2/{z}/{x}/{y}.png', {
     attribution: "国土地理院", maxNativeZoom: 18, maxZoom: 20
 });
-var map = L.map('mapdiv', {//zoomControl: false,
+var map = L.map('mapdiv', {
   center: [36.0315, 139.9892], zoom: 16, minZoom: 16, 
-  layers: [ort, cmp]});
-map.addControl(L.control.zoom({position: 'bottomeleft'}));
+  layers: [ort, cmp], zoomControl: false});
+new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
 var hash = L.hash(map);
 var range = document.getElementById('range');
 function clip() {
