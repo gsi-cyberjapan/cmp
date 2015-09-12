@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>70 years</title>
+<title>比較</title>
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"/>
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
 <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
@@ -31,7 +31,7 @@ var cmp = L.tileLayer(
     attribution: "国土地理院", maxNativeZoom: 18, maxZoom: 20
 });
 var map = L.map('mapdiv', {
-  center: [38.554207,140.936222], zoom: 13, layers: [ort, cmp]});
+  center: [38.554207, 140.936222], zoom: 13, layers: [ort, cmp]});
 new L.Control.Zoom({position: 'bottomright'}).addTo(map);
 var hash = L.hash(map);
 var range = document.getElementById('range');
