@@ -2,6 +2,8 @@
 ## ページ一覧
 
 - [常総地区](http://gsi-cyberjapan.github.io/cmp/joso.html)
+- [大崎地区](http://gsi-cyberjapan.github.io/cmp/ohsaki.html)
+- [鹿沼地区](http://gsi-cyberjapan.github.io/cmp/kanuma.html)
 
 ## 操作説明
 のちほど整備するかもしれません。
