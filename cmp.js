@@ -18,8 +18,12 @@ var main_loop = function() {
   });
   map = L.map('mapdiv', {
     center: [LAT, LNG], zoom: 16, minZoom: 10,
-    layers: [ort, cmp], zoomControl: false});
-  new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
+    layers: [ort, cmp], zoomControl: false, attributionControl: false});
+  L.control.attribution({
+    position: 'bottomright',
+    prefix: "<a target='cmp_usage' href='http://gsi-cyberjapan.github.io/cmp/op.png'>使い方</a>"
+  }).addTo(map);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
   var hash = L.hash(map);
   var range = document.getElementById('range');
 
