@@ -30,7 +30,7 @@ var main_loop = function() {
   if(L.Browser.ie) {
     if(L.Browser.ielt9) {
       alert("被災前後比較はお使いのブラウザに対応していません。\nChrome, Firefox, Safari でアクセスしてください。\n地理院地図に移動します。");
-      document.location.href = gsimaps;
+      window.location = gsimaps;
     }
     alert("お使いのブラウザでは写真の境をスライダで調整できません。\nスライダが必要な場合、Chrome, Firefox, Safari でアクセスしてください。");
   }
