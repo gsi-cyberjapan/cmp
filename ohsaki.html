@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>比較</title>
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"/>
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+<link rel="stylesheet" href="cmp.css"/>
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<script src="http://handygeospatial.github.io/mapsites/js/leaflet-hash.js"></script>
+<script src="http://handygeospatial.github.io/mapsites/js/TileLayer.GeoJSON.js"></script>
+<script src="http://handygeospatial.github.io/mapsites/js/corslite.js"></script>
+<script src="cmp.js"></script>
+</head>
+<body>
+<input id='range' class='range' type='range' min='0', max='1.0' step='any'/>
+<div id='mapdiv'>
+<script>
+BG_URL = 'http://cyberjapandata.gsi.go.jp/xyz/1509typhoon18_photo_shibuigawa_150911_1/{z}/{x}/{y}.png';
+FG_URL = 'http://cyberjapandata.gsi.go.jp/xyz/20150912dol/{z}/{x}/{y}.png';
+LNG = 140.940911; LAT = 38.551488;
+main_loop();
+</script>
+</body>
+</html>
