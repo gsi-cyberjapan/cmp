@@ -9,7 +9,7 @@
 - [結城地区](http://gsi-cyberjapan.github.io/cmp/yuki.html)
 
 ## 操作説明
-のちほど整備するかもしれません。
+![操作説明](op.png)
 
 ## 運用担当者向け運用指針
 1. 地区名ごとに HTML ファイルを作ります。joso.html を {place}.html としてコピーすればよいでしょう。
