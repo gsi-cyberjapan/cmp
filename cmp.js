@@ -27,7 +27,7 @@ var main_loop = function() {
   map.on('move', clip);
   clip();
 
-  if(L.Browser.ie) {
+  if(L.Browser.ielt9) {
     alert("被災前後比較はお使いのブラウザに対応していません。\nChrome, Firefox, Safari でアクセスしてください。\n地理院地図に移動します。");
     document.location.href = gsimaps;
   }
