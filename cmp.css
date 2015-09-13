@@ -3,4 +3,4 @@ html, body, #mapdiv {height: 100%; width: 100%;}
 .leaflet-container {background: #fff; bottom: 20px}
 .range {position: absolute; width: 100%; bottom: 0px}
 input[type='range']{-webkit-appearance: none;
-  -moz-appearance:none; background-color: #a59aca;}
+  -moz-appearance:none; background-color: #89ff0f;}
