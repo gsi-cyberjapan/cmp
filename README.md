@@ -3,7 +3,10 @@
 
 - [常総地区](http://gsi-cyberjapan.github.io/cmp/joso.html)
 - [大崎地区](http://gsi-cyberjapan.github.io/cmp/ohsaki.html)
+  - [大崎地区渋井川](http://gsi-cyberjapan.github.io/cmp/shibui.html)
+  - [大崎地区吉田川](http://gsi-cyberjapan.github.io/cmp/yoshida.html)
 - [鹿沼地区](http://gsi-cyberjapan.github.io/cmp/kanuma.html)
+- [結城地区](http://gsi-cyberjapan.github.io/cmp/yuki.html)
 
 ## 操作説明
 のちほど整備するかもしれません。
