@@ -23,4 +23,11 @@ var main_loop = function() {
   range['oninput' in range ? 'oninput' : 'onchange'] = clip;
   map.on('move', clip);
   clip();
+
+  if(L.Browser.ie) {
+    alert("Internet Explorerを用いた被災前後比較は現在準備中です。地理院地図に移動します");
+    var ct = map.getCenter();
+    document.location.href = 'http://maps.gsi.go.jp/?ll=' +
+      ct.lat + ',' + ct.lng + '&z=16&base=std&cd=f2%2Ff2_6&vs=c1j0l0u0&d=l';
+  }
 }
