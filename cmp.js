@@ -28,7 +28,7 @@ var main_loop = function() {
   clip();
 
   if(L.Browser.ie) {
-    alert("Internet Explorerを用いた被災前後比較は現在準備中です。地理院地図に移動します");
+    alert("被災前後比較はお使いのブラウザに対応していません。\nChrome, Firefox, Safari でアクセスしてください。\n地理院地図に移動します。");
     document.location.href = gsimaps;
   }
 }
