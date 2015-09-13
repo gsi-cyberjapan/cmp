@@ -7,11 +7,14 @@ var clip = function() {
 }
 
 var main_loop = function() {
+  gsimaps = 'http://maps.gsi.go.jp/?ll=' +
+    LAT + ',' + LNG + '&z=16&base=std&cd=f2%2Ff2_6&vs=c1j0l0u0&d=l';
+  attr = "<a href='" + gsimaps + "'>地理院地図</a>";
   ort = L.tileLayer(BG_URL, {
-    attribution: "国土地理院", maxNativeZoom: 18, maxZoom: 20
+    attribution: attr, maxNativeZoom: 18, maxZoom: 20
   });
   cmp = L.tileLayer(FG_URL, {
-    attribution: "国土地理院", maxNativeZoom: 18, maxZoom: 20
+    attribution: attr, maxNativeZoom: 18, maxZoom: 20
   });
   map = L.map('mapdiv', {
     center: [LAT, LNG], zoom: 16, minZoom: 10,
@@ -26,8 +29,6 @@ var main_loop = function() {
 
   if(L.Browser.ie) {
     alert("Internet Explorerを用いた被災前後比較は現在準備中です。地理院地図に移動します");
-    var ct = map.getCenter();
-    document.location.href = 'http://maps.gsi.go.jp/?ll=' +
-      ct.lat + ',' + ct.lng + '&z=16&base=std&cd=f2%2Ff2_6&vs=c1j0l0u0&d=l';
+    document.location.href = gsimaps;
   }
 }
