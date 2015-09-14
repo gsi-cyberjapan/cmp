@@ -138,6 +138,7 @@ var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
    for ( var i=0; i<ovlnum.length; i++ ){
     if ( ljson[ovlnum[i]].url.match(/\{y\}\.geojson$/)){
      var stylejsurl = ljson[ovlnum[i]].url.replace('{z}/{x}/{y}.geojson',"style.js");
+     if(ovlnum[i] == 'experimental_anno'){stylejsurl = 'http://gsi-cyberjapan.github.io/cmp/style.js';}
      var xhr = new XMLHttpRequest();
      xhr.open('GET', stylejsurl, false);
      xhr.send(null);
