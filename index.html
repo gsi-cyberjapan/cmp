@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>比較</title>
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"/>
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+<link rel="stylesheet" href="cmp.css"/>
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<script src="http://handygeospatial.github.io/mapsites/js/leaflet-hash.js"></script>
+<script src="http://handygeospatial.github.io/mapsites/js/TileLayer.GeoJSON.js"></script>
+<script src="http://handygeospatial.github.io/mapsites/js/corslite.js"></script>
+<!-- jquery -->
+<script type="text/javascript" src="http://cyberjapandata.gsi.go.jp/3d/site/jquery-1.9.1.js"></script>
+<!-- jquery UI -->
+<script type="text/javascript" src="http://cyberjapandata.gsi.go.jp/3d/site/jquery-ui.js"></script>
+<link rel="stylesheet" href="http://cyberjapandata.gsi.go.jp/3d/site/jquery-ui.css">
+<link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css">
+
+<style>
+	html, body {margin: 0 auto; padding: 0; margin: 0; height: 100%; width: 100%;}
+	.leaflet-container {background: #fff;}
+</style>
+
+<script>
+//url params start
+var vars = {};
+var temp_params = window.location.search.substring(1).split('&');
+for(var i = 0; i <temp_params.length; i++) {
+ var params = temp_params[i].split('=');
+ vars[params[0]] = params[1];
+}
+//console.log(JSON.stringify(vars)); 
+//url params end
+
+var regsimaps = 'http://maps.gsi.go.jp/?d=l#' + vars["z"] + '/' + vars["lat"] + '/' + vars["lng"];
+  if(L.Browser.ie) {
+    if(L.Browser.ielt9) {
+      alert("被災前後比較はお使いのブラウザに対応していません。\nChrome, Firefox, Safari でアクセスしてください。\n地理院地図に移動します。");
+    } else {
+      alert("お使いのブラウザでは写真の境をスライダで調整できません。\nスライダが必要な場合、Chrome, Firefox, Safari でアクセスしてください。");
+    }
+    if(L.Browser.ielt9) document.location.href = regsimaps;
+  }
+
+
+
+//lyer load start
+var layerarray = ['http://cyberjapandata.gsi.go.jp/layers_txt/layers0.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers1.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers2.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers3.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers4.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers_experimental.txt'];
+var ljson={};
+
+function layersearch(layerdata,parent){
+ if ( !layerdata ) return;
+ for ( var i=0; i<layerdata.length; i++ ){
+  if ( layerdata[i].type == "Layer"){
+   if ( layerdata[i].url.match(/\{y\}\.jpg$/) || layerdata[i].url.match(/\{y\}\.png$/) || layerdata[i].url.match(/\{y\}\.geojson$/)){
+    if(!layerdata[i].maxNativeZoom){
+     if(!layerdata[i].maxZoom){
+      layerdata[i].maxNativeZoom = 18;
+     }else{
+      layerdata[i].maxNativeZoom = layerdata[i].maxZoom;
+     }
+    }
+    if(!layerdata[i].minZoom){
+     layerdata[i].minZoom = 2;
+    }
+    if(!layerdata[i].maxZoom){
+     layerdata[i].maxZoom = 18;
+    }
+    ljson[layerdata[i].id] = {title:layerdata[i].title,url:layerdata[i].url,minZoom:layerdata[i].minZoom,maxZoom:layerdata[i].maxZoom,maxNativeZoom:layerdata[i].maxNativeZoom};
+   }
+  }
+  layersearch(layerdata[i].entries,layerdata[i]);
+ }
+}
+
+for ( var ti=0; ti<layerarray.length; ti++ ){
+var xhr = new XMLHttpRequest();
+xhr.open('GET', layerarray[ti], false);
+xhr.send(null);
+var result = JSON.parse(xhr.responseText);
+layersearch(result.layers,null);
+}
+
+//console.log(JSON.stringify(ljson)); 
+//lyer load end
+
+var GSI = {
+	GLOBALS : {}
+};
+
+var clip = function() {
+  var nw = GSI.GLOBALS.map.containerPointToLayerPoint([0, 0]),
+      se = GSI.GLOBALS.map.containerPointToLayerPoint(GSI.GLOBALS.map.getSize()),
+      clipX = nw.x + (se.x - nw.x) * range.value;
+  cmp.getContainer().style.clip =
+    'rect(' + [nw.y, clipX, se.y, nw.x].join('px,') + 'px)';
+}
+
+var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
+  var gsimaps = 'http://maps.gsi.go.jp/?d=l#' + Z + '/' + LAT + '/' + LNG;
+  var attr = "<a href='" + gsimaps + "'>地理院地図</a>";
+  bgl = L.tileLayer(ljson[BG].url, {
+    minZoom: ljson[BG].minZoom, maxNativeZoom: ljson[BG].maxNativeZoom, maxZoom: 20
+  });
+  cmp = L.tileLayer(ljson[FG].url, {
+    minZoom: ljson[FG].minZoom, maxNativeZoom: ljson[FG].maxNativeZoom, maxZoom: 20
+  });
+  GSI.GLOBALS.map = L.map('mapdiv', {
+    center: [LAT, LNG], zoom: Z, minZoom: 10,
+    layers: [bgl, cmp], zoomControl: false, attributionControl: false});
+  L.control.attribution({
+    position: 'topright',
+    prefix: "<div style='margin-top:20px'><a target='cmp_usage' href='http://gsi-cyberjapan.github.io/cmp/op.png'>使い方　</a>"+attr+"</div>"
+  }).addTo(GSI.GLOBALS.map);
+  
+  if(RATTR){
+  RATTR = "<div>" + decodeURI(RATTR) + "</div>";
+    L.control.attribution({
+    position: 'bottomright',
+    prefix: RATTR
+  }).addTo(GSI.GLOBALS.map);
+  }
+  if(LATTR){
+  LATTR = "<div>" + decodeURI(LATTR) + "</div>";
+    L.control.attribution({
+    position: 'bottomleft',
+    prefix: LATTR
+  }).addTo(GSI.GLOBALS.map);
+  }
+
+  
+  if(OVL){
+   var baseLayers ={};
+   var overlays = {};
+   var ovll={};
+   var ovlnum = OVL.split( ',' );
+   for ( var i=0; i<ovlnum.length; i++ ){
+    if ( ljson[ovlnum[i]].url.match(/\{y\}\.geojson$/)){
+     var stylejsurl = ljson[ovlnum[i]].url.replace('{z}/{x}/{y}.geojson',"style.js");
+     var xhr = new XMLHttpRequest();
+     xhr.open('GET', stylejsurl, false);
+     xhr.send(null);
+     var stylejs = eval( "(" + xhr.responseText + ")" ); 
+     ovll[ovlnum[i]] = new L.TileLayer.GeoJSON(ljson[ovlnum[i]].url,
+      {minZoom: ljson[ovlnum[i]].minZoom, maxNativeZoom: ljson[ovlnum[i]].maxNativeZoom, maxZoom: ljson[ovlnum[i]].maxZoom},stylejs.geojsonOptions);
+     GSI.GLOBALS.map.addLayer(ovll[ovlnum[i]]);
+     overlays[ljson[ovlnum[i]].title]=ovll[ovlnum[i]];
+    }else{
+     ovll[ovlnum[i]]=new L.TileLayer(ljson[ovlnum[i]].url,
+      {minZoom: ljson[ovlnum[i]].minZoom, maxNativeZoom: ljson[ovlnum[i]].maxNativeZoom, maxZoom: ljson[ovlnum[i]].maxZoom});
+     GSI.GLOBALS.map.addLayer(ovll[ovlnum[i]]);
+     overlays[ljson[ovlnum[i]].title]=ovll[ovlnum[i]];
+    }
+   }
+
+   L.control.attribution({
+    position: 'topleft',
+    prefix: "　"
+   }).addTo(GSI.GLOBALS.map);
+  
+   L.control.layers(baseLayers, overlays,{position:'topleft',collapsed:false}).addTo(GSI.GLOBALS.map);
+  }
+  
+  
+  L.control.zoom({ position: 'bottomright' }).addTo(GSI.GLOBALS.map);
+  
+
+
+  var hash = L.hash(GSI.GLOBALS.map);
+  var range = document.getElementById('range');
+
+  range['oninput' in range ? 'oninput' : 'onchange'] = clip;
+  GSI.GLOBALS.map.on('move', clip);
+  clip();
+
+}
+
+
+</script>
+</head>
+<body>
+<input id='range' class='range' type='range' min='0', max='1.0' step='any'/>
+<div id='mapdiv'  style="margin: 0 auto; position: absolute; width:100%; height:100%; margin:0px; padding:0px;"></div>
+<script>
+main_loop(vars["rl"],vars["ll"],vars["ovl"],vars["lat"],vars["lng"],vars["z"],vars["rattr"],vars["lattr"]);
+</script>
+</body>
+</html>
