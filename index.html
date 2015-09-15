@@ -5,22 +5,19 @@
 <title>比較</title>
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"/>
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
-<link rel="stylesheet" href="cmp.css"/>
+<style>
+body {padding: 0; margin: 0}
+html, body, #mapdiv {height: 100%; width: 100%;}
+.leaflet-container {background: #fff; bottom: 20px}
+.range {position: absolute; width: 100%; bottom: 0px}
+input[type='range']{-webkit-appearance: none;
+  -moz-appearance:none; background-color: #89ff0f;}
+</style>
+
 <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 <script src="http://handygeospatial.github.io/mapsites/js/leaflet-hash.js"></script>
 <script src="http://handygeospatial.github.io/mapsites/js/TileLayer.GeoJSON.js"></script>
 <script src="http://handygeospatial.github.io/mapsites/js/corslite.js"></script>
-<!-- jquery -->
-<script type="text/javascript" src="http://cyberjapandata.gsi.go.jp/3d/site/jquery-1.9.1.js"></script>
-<!-- jquery UI -->
-<script type="text/javascript" src="http://cyberjapandata.gsi.go.jp/3d/site/jquery-ui.js"></script>
-<link rel="stylesheet" href="http://cyberjapandata.gsi.go.jp/3d/site/jquery-ui.css">
-<link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css">
-
-<style>
-	html, body {margin: 0 auto; padding: 0; margin: 0; height: 100%; width: 100%;}
-	.leaflet-container {background: #fff;}
-</style>
 
 <script>
 //url params start
@@ -43,9 +40,7 @@ var regsimaps = 'http://maps.gsi.go.jp/?d=l#' + vars["z"] + '/' + vars["lat"] + 
     if(L.Browser.ielt9) document.location.href = regsimaps;
   }
 
-
-
-//lyer load start
+//layertxt load start
 var layerarray = ['http://cyberjapandata.gsi.go.jp/layers_txt/layers0.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers1.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers2.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers3.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers4.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers_experimental.txt'];
 var ljson={};
 
@@ -83,7 +78,7 @@ layersearch(result.layers,null);
 }
 
 //console.log(JSON.stringify(ljson)); 
-//lyer load end
+//layertxt load end
 
 var GSI = {
 	GLOBALS : {}
@@ -170,7 +165,6 @@ var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
 
   var hash = L.hash(GSI.GLOBALS.map);
   var range = document.getElementById('range');
-
   range['oninput' in range ? 'oninput' : 'onchange'] = clip;
   GSI.GLOBALS.map.on('move', clip);
   clip();
@@ -181,8 +175,8 @@ var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
 </script>
 </head>
 <body>
-<input id='range' class='range' type='range' min='0', max='1.0' step='any'/>
-<div id='mapdiv'  style="margin: 0 auto; position: absolute; width:100%; height:100%; margin:0px; padding:0px;"></div>
+<input id='range' class='range' type='range' min='0', max='1.0' step='any' />
+<div id='mapdiv'></div>
 <script>
 main_loop(vars["rl"],vars["ll"],vars["ovl"],vars["lat"],vars["lng"],vars["z"],vars["rattr"],vars["lattr"]);
 </script>
