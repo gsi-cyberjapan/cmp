@@ -161,7 +161,7 @@ var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
 
 
   var hash = L.hash(GSI.GLOBALS.map);
-  slider = $('#slider').slider({value: 50,slide: clip });
+  slider = $('#slider').slider({value: 50,slide: clip,change: clip });
   GSI.GLOBALS.map.on('resize', clip);
   clip();
 
