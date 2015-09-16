@@ -6,18 +6,23 @@
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"/>
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
 <style>
-body {padding: 0; margin: 0}
-html, body, #mapdiv {height: 100%; width: 100%;}
-.leaflet-container {background: #fff; bottom: 20px}
-.range {position: absolute; width: 100%; bottom: 0px}
-input[type='range']{-webkit-appearance: none;
-  -moz-appearance:none; background-color: #89ff0f;}
+html, body {padding: 0; margin: 0; height: 100%; width: 100%;background:#89ff0f;}
+.leaflet-container {background: #fff;}
+#mapdiv{position: absolute; width:100%; top:0; left:0; bottom:30px; margin:0px; padding:0px;}
+footer{position: absolute;bottom: 0;left:0;width:100%;height:auto;}
+#slider{margin:10px 20px;}
 </style>
 
 <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 <script src="http://handygeospatial.github.io/mapsites/js/leaflet-hash.js"></script>
 <script src="http://handygeospatial.github.io/mapsites/js/TileLayer.GeoJSON.js"></script>
 <script src="http://handygeospatial.github.io/mapsites/js/corslite.js"></script>
+
+<script src="http://cyberjapandata.gsi.go.jp/3d/site/jquery-1.9.1.js"></script>
+<script src="http://cyberjapandata.gsi.go.jp/3d/site/jquery-ui.js"></script>
+<script src="http://frogcat.github.io/leaflet-tilelayer-clip/leaflet-tilelayer-clip.js"></script>
+<link rel="stylesheet" href="http://cyberjapandata.gsi.go.jp/3d/site/jquery-ui.css">
+<link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css">
 
 <script>
 //url params start
@@ -31,14 +36,10 @@ for(var i = 0; i <temp_params.length; i++) {
 //url params end
 
 var regsimaps = 'http://maps.gsi.go.jp/?d=l#' + vars["z"] + '/' + vars["lat"] + '/' + vars["lng"];
-  if(L.Browser.ie) {
-    if(L.Browser.ielt9) {
-      alert("被災前後比較はお使いのブラウザに対応していません。\nChrome, Firefox, Safari でアクセスしてください。\n地理院地図に移動します。");
-    } else {
-      alert("お使いのブラウザでは写真の境をスライダで調整できません。\nスライダが必要な場合、Chrome, Firefox, Safari でアクセスしてください。");
-    }
-    if(L.Browser.ielt9) document.location.href = regsimaps;
-  }
+if(L.Browser.ielt9) {
+  alert("被災前後比較はお使いのブラウザに対応していません。\nChrome, Firefox, Safari でアクセスしてください。\n地理院地図に移動します。");
+  document.location.href = regsimaps;
+}
 
 //layertxt load start
 var layerarray = ['http://cyberjapandata.gsi.go.jp/layers_txt/layers0.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers1.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers2.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers3.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers4.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers_experimental.txt'];
@@ -84,12 +85,14 @@ var GSI = {
 	GLOBALS : {}
 };
 
+var slider = null;
 var clip = function() {
-  var nw = GSI.GLOBALS.map.containerPointToLayerPoint([0, 0]),
-      se = GSI.GLOBALS.map.containerPointToLayerPoint(GSI.GLOBALS.map.getSize()),
-      clipX = nw.x + (se.x - nw.x) * range.value;
-  cmp.getContainer().style.clip =
-    'rect(' + [nw.y, clipX, se.y, nw.x].join('px,') + 'px)';
+  if(slider && GSI.GLOBALS.map){
+    var p = GSI.GLOBALS.map.getSize();
+    var w = p.x * (parseFloat(slider.slider("value"))) / 100;
+    var h = p.y;
+    cmp.setClip(L.bounds([ 0, 0 ], [ w, h ])).update();
+  }
 }
 
 var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
@@ -98,7 +101,7 @@ var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
   bgl = L.tileLayer(ljson[BG].url, {
     minZoom: ljson[BG].minZoom, maxNativeZoom: ljson[BG].maxNativeZoom, maxZoom: 20
   });
-  cmp = L.tileLayer(ljson[FG].url, {
+  cmp = L.tileLayer.clip(ljson[FG].url, {
     minZoom: ljson[FG].minZoom, maxNativeZoom: ljson[FG].maxNativeZoom, maxZoom: 20
   });
   GSI.GLOBALS.map = L.map('mapdiv', {
@@ -106,7 +109,7 @@ var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
     layers: [bgl, cmp], zoomControl: false, attributionControl: false});
   L.control.attribution({
     position: 'topright',
-    prefix: "<div style='margin-top:20px'><a target='cmp_usage' href='http://gsi-cyberjapan.github.io/cmp/op.png'>使い方　</a>"+attr+"</div>"
+    prefix: "<a target='cmp_usage' href='http://gsi-cyberjapan.github.io/cmp/op.png'>使い方　</a>"+attr
   }).addTo(GSI.GLOBALS.map);
   
   if(RATTR){
@@ -149,12 +152,6 @@ var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
      overlays[ljson[ovlnum[i]].title]=ovll[ovlnum[i]];
     }
    }
-
-   L.control.attribution({
-    position: 'topleft',
-    prefix: "　"
-   }).addTo(GSI.GLOBALS.map);
-  
    L.control.layers(baseLayers, overlays,{position:'topleft',collapsed:false}).addTo(GSI.GLOBALS.map);
   }
   
@@ -164,9 +161,8 @@ var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
 
 
   var hash = L.hash(GSI.GLOBALS.map);
-  var range = document.getElementById('range');
-  range['oninput' in range ? 'oninput' : 'onchange'] = clip;
-  GSI.GLOBALS.map.on('move', clip);
+  slider = $('#slider').slider({value: 50,slide: clip,change: clip });
+  GSI.GLOBALS.map.on('resize', clip);
   clip();
 
 }
@@ -175,7 +171,7 @@ var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
 </script>
 </head>
 <body>
-<input id='range' class='range' type='range' min='0', max='1.0' step='any' />
+<footer><div id='slider'></div></footer>
 <div id='mapdiv'></div>
 <script>
 main_loop(vars["rl"],vars["ll"],vars["ovl"],vars["lat"],vars["lng"],vars["z"],vars["rattr"],vars["lattr"]);
