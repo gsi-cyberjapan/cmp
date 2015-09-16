@@ -12,6 +12,18 @@
 ![操作説明](op.png)
 
 ## 運用担当者向け運用指針
-1. 地区名ごとに HTML ファイルを作ります。joso.html を {place}.html としてコピーすればよいでしょう。
-2. {place}.html の変数 BG_URL（背景のテンプレートURL）, FG_URL（前景のテンプレートURL）, LNG（経度）, LAT（緯度）を変更します。
-3. {place}.html をブラウザで見て、問題なければ作業終了です。
+1. index.htmlがベースです。
+2. index.htmlにURLパラメータをつけることで各種設定で地図が開きます。
+3. index.htmlのURLパラメータは下記の通りです。
+- rl：右側の地図。地理院タイルのidで指定。画像タイルに対応。必須。
+- ll：左側の地図。地理院タイルのidで指定。画像タイルに対応。必須。
+- ovl：追加する情報。地理院タイルのidで指定。画像タイル、ベクトルタイルに対応。複数指定可能(","区切り)。任意。
+- lat：初期表示の緯度。必須。
+- lng：初期表示の経度。必須。
+- z：初期表示のズームレベル。必須。
+- rattr：右側の地図の説明。任意。
+- lattr：左側の地図の説明。任意。
+  - URL例：
+  - http://gsi-cyberjapan.github.io/cmp/?rl=std&ll=ort&ovl=experimental_anno,experimental_railcl&lat=35.6993&lng=139.9873&z=16&rattr=標準地図&lattr=電子地形図(オルソ)
+  - ※rattr、lattrが日本語の場合は、URLエンコードするとよいかもしれません。
+4. 各地区のhtmlは、index.htmlへのリダイレクトを記載する形です。
