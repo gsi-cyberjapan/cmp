@@ -25,5 +25,6 @@
   - lattr：左側の地図の説明。任意。
     - URL例：
     - http://gsi-cyberjapan.github.io/cmp/?rl=std&ll=ort&ovl=experimental_anno,experimental_railcl&lat=35.6993&lng=139.9873&z=16&rattr=標準地図&lattr=電子地形図(オルソ)
+    - http://maps.gsi.go.jp/cmp/?rl=std&ll=ort&ovl=experimental_anno,experimental_railcl&lat=35.6993&lng=139.9873&z=16&rattr=標準地図&lattr=電子地形図(オルソ)
     - ※rattr、lattrが日本語の場合は、URLエンコードするとよいかもしれません。
 4. 各地区のhtmlは、index.htmlへのリダイレクトを記載する形です。
