@@ -43,7 +43,7 @@ if(L.Browser.ielt9) {
 }
 
 //layertxt load start
-var layerarray = ['http://cyberjapandata.gsi.go.jp/layers_txt/layers0.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers1.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers2.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers3.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers4.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers_experimental.txt'];
+var layerarray = ['http://cyberjapandata.gsi.go.jp/layers_txt/layers0.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers1.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers2.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers3.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers4.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers5.txt','http://cyberjapandata.gsi.go.jp/layers_txt/layers_experimental.txt'];
 var ljson={};
 
 function layersearch(layerdata,parent){
@@ -110,7 +110,7 @@ var main_loop = function(BG,FG,OVL,LAT,LNG,Z,RATTR,LATTR) {
     layers: [bgl, cmp], zoomControl: false, attributionControl: false});
   L.control.attribution({
     position: 'topright',
-    prefix: "<a target='cmp_usage' href='http://gsi-cyberjapan.github.io/cmp/op.png'>使い方　</a>"+attr
+    prefix: "<a target='cmp_usage' href='./op.png'>使い方　</a>"+attr
   }).addTo(GSI.GLOBALS.map);
   
   if(RATTR){
