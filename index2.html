@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"/>
+
+<title>比較</title>
+
+<style>
+  html, body {padding:0; margin:0; height:100%; width:100%; background:#89ff0f;}
+  .leaflet-container {background:#fff;}
+  #mapdiv{position:absolute; width:100%; top:0; left:0; bottom:30px; margin:0px; padding:0px;}
+  footer{position:absolute; bottom:0; left:0; width:100%; height:auto;}
+  #slider{margin:10px 20px;}
+</style>
+
+<script src="http://maps.gsi.go.jp/cmp/leaflet-0.7.3/leaflet.js"></script>
+<script src="http://maps.gsi.go.jp/cmp/leaflet-plugin/leaflet-hash.js"></script>
+<script src="http://maps.gsi.go.jp/cmp/leaflet-plugin/TileLayer.GeoJSON.js"></script>
+<script src="http://maps.gsi.go.jp/cmp/corslite.js"></script>
+<script src="http://maps.gsi.go.jp/cmp/jquery/jquery-1.9.1.js"></script>
+<script src="http://maps.gsi.go.jp/cmp/jquery/jquery-ui.min.js"></script>
+<script src="http://maps.gsi.go.jp/cmp/leaflet-plugin/leaflet-tilelayer-clip.js"></script>
+<script src="http://maps.gsi.go.jp/cmp/jquery/jquery.ui.touch-punch.min.js"></script>
+
+<link rel="stylesheet" href="http://maps.gsi.go.jp/cmp/leaflet-0.7.3/leaflet.css"/>
+<link rel="stylesheet" href="http://maps.gsi.go.jp/cmp/jquery/jquery-ui.css">
+<link rel="stylesheet" href="http://maps.gsi.go.jp/cmp/style.css">
+
+<script>
+//url params start
+var vars = {};
+var temp_params = window.location.search.substring(1).split('&');
+for(var i = 0; i <temp_params.length; i++) {
+  var params = temp_params[i].split('=');
+  vars[params[0]] = params[1];
+}
+//url params end
+
+var regsimaps = 'http://maps.gsi.go.jp/?d=l#' + vars["z"] + '/' + vars["lat"] + '/' + vars["lng"];
+if(L.Browser.ielt9) {
+  alert("被災前後比較はお使いのブラウザに対応していません。\nChrome, Firefox, Safari でアクセスしてください。\n地理院地図に移動します。");
+  document.location.href = regsimaps;
+}
+
+//layers_txt load start
+var layerarray = [
+  'http://cyberjapandata.gsi.go.jp/layers_txt/layers0.txt',
+  'http://cyberjapandata.gsi.go.jp/layers_txt/layers1.txt',
+  'http://cyberjapandata.gsi.go.jp/layers_txt/layers2.txt',
+  'http://cyberjapandata.gsi.go.jp/layers_txt/layers3.txt',
+  'http://cyberjapandata.gsi.go.jp/layers_txt/layers4.txt',
+  'http://cyberjapandata.gsi.go.jp/layers_txt/layers5.txt',
+  'http://cyberjapandata.gsi.go.jp/layers_txt/layers_experimental.txt',
+  'http://cyberjapandata.gsi.go.jp/layers_txt/layers_20160414kumamoto.txt',
+  '../layers_txt/layers_20170705typhoon3.txt'
+];
+var ljson={};
+
+function layersearch(layerdata,parent){
+  if ( !layerdata ) return;
+  for ( var i=0; i<layerdata.length; i++ ){
+    if ( layerdata[i].type == "Layer"){
+      if ( layerdata[i].url.match(/\{y\}\.jpg$/) || layerdata[i].url.match(/\{y\}\.png$/) || layerdata[i].url.match(/\{y\}\.geojson$/)){
+        if(!layerdata[i].maxNativeZoom){
+          if(!layerdata[i].maxZoom){
+            layerdata[i].maxNativeZoom = 18;
+          }else{
+            layerdata[i].maxNativeZoom = layerdata[i].maxZoom;
+          }
+        }
+        if(!layerdata[i].minZoom){
+          layerdata[i].minZoom = 2;
+        }
+        if(!layerdata[i].maxZoom){
+          layerdata[i].maxZoom = 18;
+        }
+        ljson[layerdata[i].id] = {title:layerdata[i].title,url:layerdata[i].url,minZoom:layerdata[i].minZoom,maxZoom:layerdata[i].maxZoom,maxNativeZoom:layerdata[i].maxNativeZoom};
+      }
+    }
+    layersearch(layerdata[i].entries,layerdata[i]);
+  }
+}
+
+for ( var ti=0; ti<layerarray.length; ti++ ){
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', layerarray[ti], false);
+  xhr.send(null);
+  var result = JSON.parse(xhr.responseText);
+  layersearch(result.layers,null);
+}
+//layertxt load end
+
+var GSI = {
+  GLOBALS : {}
+};
+
+var slider = null;
+var clip = function() {
+  if(slider && GSI.GLOBALS.map){
+    var p = GSI.GLOBALS.map.getSize();
+    var w = p.x * (parseFloat(slider.slider("value"))) / 100;
+    var h = p.y;
+    cmp.setClip(L.bounds([ 0, 0 ], [ w, h ])).update();
+    cmp2.setClip(L.bounds([ w, 0 ], [ p.x, h ])).update();
+  }
+}
+
+// 20170709「rl→背景、ll→左側のみ前景」という処理を、「背景は標準地図、rl→右側のみ前景、ll→左側のみ前景」という処理に変更
+var main_loop = function(RL,LL,OVL,LAT,LNG,Z,RATTR,LATTR) {
+  var gsimaps = 'http://maps.gsi.go.jp/?d=l#' + Z + '/' + LAT + '/' + LNG;
+  var attr = "<a href='" + gsimaps + "'>地理院地図</a>";
+  bgl = L.tileLayer(ljson["std"].url, {
+    minZoom: ljson["std"].minZoom, maxNativeZoom: ljson["std"].maxNativeZoom, maxZoom: 18
+  });
+  cmp = L.tileLayer.clip(ljson[LL].url, {
+    minZoom: ljson[LL].minZoom, maxNativeZoom: ljson[LL].maxNativeZoom, maxZoom: 18
+  });
+  cmp2 = L.tileLayer.clip(ljson[RL].url, {
+    minZoom: ljson[RL].minZoom, maxNativeZoom: ljson[RL].maxNativeZoom, maxZoom: 18
+  });
+  GSI.GLOBALS.map = L.map('mapdiv', {
+    center: [LAT, LNG], zoom: Z, minZoom: 10,
+    layers: [bgl, cmp, cmp2], zoomControl: false, attributionControl: false
+  });
+  L.control.attribution({
+    position: 'topright',
+    prefix: "<a target='cmp_usage' href='./op.png'>使い方　</a>"+attr
+  }).addTo(GSI.GLOBALS.map);
+  
+  if(RATTR){
+    RATTR = "<div>" + decodeURI(RATTR) + "</div>";
+    L.control.attribution({
+      position: 'bottomright',
+      prefix: RATTR
+    }).addTo(GSI.GLOBALS.map);
+  }
+  if(LATTR){
+    LATTR = "<div>" + decodeURI(LATTR) + "</div>";
+    L.control.attribution({
+      position: 'bottomleft',
+      prefix: LATTR
+    }).addTo(GSI.GLOBALS.map);
+  }
+  
+  if(OVL){
+    var baseLayers ={};
+    var overlays = {};
+    var ovll={};
+    var ovlnum = OVL.split( ',' );
+    for ( var i=0; i<ovlnum.length; i++ ){
+      if ( ljson[ovlnum[i]].url.match(/\{y\}\.geojson$/)){
+        var stylejsurl = ljson[ovlnum[i]].url.replace('{z}/{x}/{y}.geojson',"style.js");
+        if(ovlnum[i] == 'experimental_anno'){stylejsurl = 'http://gsi-cyberjapan.github.io/cmp/style.js';}
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', stylejsurl, false);
+        xhr.send(null);
+        var stylejs = eval( "(" + xhr.responseText + ")" ); 
+        ovll[ovlnum[i]] = new L.TileLayer.GeoJSON(ljson[ovlnum[i]].url,{
+          minZoom: ljson[ovlnum[i]].minZoom, maxNativeZoom: ljson[ovlnum[i]].maxNativeZoom, maxZoom: ljson[ovlnum[i]].maxZoom
+        },stylejs.geojsonOptions);
+        GSI.GLOBALS.map.addLayer(ovll[ovlnum[i]]);
+        overlays[ljson[ovlnum[i]].title]=ovll[ovlnum[i]];
+      }else{
+        ovll[ovlnum[i]]=new L.TileLayer(ljson[ovlnum[i]].url,{
+          minZoom: ljson[ovlnum[i]].minZoom, maxNativeZoom: ljson[ovlnum[i]].maxNativeZoom, maxZoom: ljson[ovlnum[i]].maxZoom
+        });
+        GSI.GLOBALS.map.addLayer(ovll[ovlnum[i]]);
+        overlays[ljson[ovlnum[i]].title]=ovll[ovlnum[i]];
+      }
+    }
+    L.control.layers(baseLayers, overlays,{position:'topleft',collapsed:false}).addTo(GSI.GLOBALS.map);
+  }
+
+  L.control.zoom({ position: 'bottomright' }).addTo(GSI.GLOBALS.map);
+
+  var hash = L.hash(GSI.GLOBALS.map);
+  slider = $('#slider').slider({value: 50,slide: clip,change: clip });
+  GSI.GLOBALS.map.on('resize', clip);
+  clip();
+}
+</script>
+</head>
+
+
+<body>
+<footer><div id='slider'></div></footer>
+<div id='mapdiv'></div>
+<script>
+  main_loop(vars["rl"],vars["ll"],vars["ovl"],vars["lat"],vars["lng"],vars["z"],vars["rattr"],vars["lattr"]);
+</script>
+</body>
+</html>
